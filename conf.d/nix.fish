@@ -1,7 +1,20 @@
-set --local profile ~/.nix-profile
+set --local use_xdg_base_directories (nix show-config use-xdg-base-directories)
+
+if not set --query XDG_STATE_HOME
+    set XDG_STATE_HOME ~/.local/state
+end
+
+if test $use_xdg_base_directories = true
+    set profile $XDG_STATE_HOME/nix/profile
+    set defexpr $XDG_STATE_HOME/nix/defexpr
+else
+    set profile ~/.nix-profile
+    set defexpr ~/.nix-defexpr
+end
+
 set --local default /nix/var/nix/profiles/default
 
-set --local channels ~/.nix-defexpr/channels
+set --local channels $defexpr/channels
 contains $channels $NIX_PATH || set --global --export --append NIX_PATH $channels
 
 function _nix_install --on-event nix_install --inherit-variable profile
