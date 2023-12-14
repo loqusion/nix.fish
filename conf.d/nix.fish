@@ -1,12 +1,18 @@
-set --local use_xdg_base_directories (nix show-config use-xdg-base-directories)
+set --local profile
+set --local defexpr
+set --local xdg_state_home
 
-if not set --query XDG_STATE_HOME
-    set XDG_STATE_HOME ~/.local/state
+if set --query XDG_STATE_HOME
+    set xdg_state_home $XDG_STATE_HOME
+else
+    set xdg_state_home ~/.local/state
 end
 
+set --local use_xdg_base_directories (nix show-config use-xdg-base-directories)
+
 if test $use_xdg_base_directories = true
-    set profile $XDG_STATE_HOME/nix/profile
-    set defexpr $XDG_STATE_HOME/nix/defexpr
+    set profile $xdg_state_home/nix/profile
+    set defexpr $xdg_state_home/nix/defexpr
 else
     set profile ~/.nix-profile
     set defexpr ~/.nix-defexpr
